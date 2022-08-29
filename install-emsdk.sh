@@ -8,7 +8,9 @@ EMSDK_DIR="$TOOL_DIR/emsdk"
 
 mkdir -p "$TOOL_DIR"
 # Get the emsdk repo
-git clone https://github.com/emscripten-core/emsdk.git "$EMSDK_DIR"
+if [ ! -d "$EMSDK_DIR" ]; then
+    git clone https://github.com/emscripten-core/emsdk.git "$EMSDK_DIR"
+fi
 cd "$EMSDK_DIR"
 ./emsdk install latest
 ./emsdk activate latest
