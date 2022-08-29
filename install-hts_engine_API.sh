@@ -3,7 +3,7 @@ set -eu
 
 HERE=$(cd $(dirname $0); pwd)
 
-TOOL_DIR="$HERE/../tools"
+TOOL_DIR="$HERE/tools"
 EMSDK_DIR="$TOOL_DIR/emsdk"
 HTS_ENGINE_API_DIR="$TOOL_DIR/hts_engine_API"
 

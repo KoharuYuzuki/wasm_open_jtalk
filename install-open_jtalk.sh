@@ -3,9 +3,9 @@ set -eu
 
 HERE=$(cd $(dirname $0); pwd)
 
-TOOL_DIR="$HERE/../tools"
-JS_DIR="$HERE/../js"
-ETC_DIR="$HERE/../etc"
+TOOL_DIR="$HERE/tools"
+JS_DIR="$HERE/js"
+ETC_DIR="$HERE/etc"
 EMSDK_DIR="$TOOL_DIR/emsdk"
 OPEN_JTALK_DIR="$TOOL_DIR/open_jtalk"
 HTS_ENGINE_API_DIR="$TOOL_DIR/hts_engine_API"
@@ -29,7 +29,7 @@ emcmake cmake -DCMAKE_BUILD_TYPE=Release \
        -DHTS_ENGINE_INCLUDE_DIR=../../../hts_engine_API/include ..
 emmake make
 
-cd $HERE/..
+cd $HERE
 # libopenjtalk.aからwasm及びjsファイルを作成
 # src/bin/open_jtalk.cをビルド
 emcc "$OPEN_JTALK_DIR/src/bin/open_jtalk.c" \
