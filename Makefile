@@ -7,6 +7,9 @@ install-hts_engine_API:
 install-open_jtalk:
 	./install-open_jtalk.sh
 
+build-wasm:
+	./build-wasm.sh
+
 clean-emsdk:
 	rm -rf tools/emsdk/
 
