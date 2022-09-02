@@ -1,3 +1,8 @@
+install-all:
+	make install-emsdk
+	make install-hts_engine_API
+	make install-open_jtalk
+
 install-emsdk:
 	./install-emsdk.sh
 
@@ -9,6 +14,9 @@ install-open_jtalk:
 
 build-wasm:
 	./build-wasm.sh
+
+modify-wasm:
+	node modify.js
 
 clean-emsdk:
 	rm -rf tools/emsdk/
