@@ -10,6 +10,10 @@ openJTalk.run({
   rate:  48000,
   type:  'token', // token or wav
   tmp:   'path/to/tmp_dir'
-}, (result) => {
-  console.log(result);
+}, (err, result) => {
+  if (!err) {
+    console.log(err);
+  } else {
+    console.log(result);
+  }
 });
