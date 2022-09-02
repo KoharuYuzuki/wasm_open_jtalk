@@ -23,7 +23,7 @@
     "url": "git+ssh://git@github.com/hrhr49/wasm_open_jtalk.git"
   },
   "author": "hrhr49 <hiro49410@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/hrhr49/wasm_open_jtalk/issues"
   },
