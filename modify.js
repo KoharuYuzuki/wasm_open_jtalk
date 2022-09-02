@@ -7,7 +7,10 @@ const outputPath = './js/open_jtalk_modified.js';
 
 const replace = [
   ['process[\'argv\']', 'argv'],
-  ['require(\'fs\')', 'fileSystem']
+  ['require(\'fs\')', 'fileSystem'],
+  ['process[\'on\']', '(() => {})'],
+  ['throw toThrow;', '/* throw toThrow; */'],
+  ['process[\'exit\'](status);', '/* process[\'exit\'](status); */\n    if (!called) _fs.rmSync(inputPath);\n    if (!called) _fs.rmSync(outputPath);\n    if (!called) callback(toThrow, null);\n    called = true;']
 ];
 
 let script = fs.readFileSync(inputPath, {encoding: 'utf-8'});
@@ -278,6 +281,8 @@ function label2token (log) {
 }
 
 const runOpenJTalk = (options, callback) => {
+let called = false;
+
 const tmpDir = ('tmp' in options) ? options.tmp : '.';
 const inputName = 'openjtalk_input_' + _crypto.randomUUID();
 const outputName = 'openjtalk_output_' + _crypto.randomUUID();
@@ -327,10 +332,12 @@ const fileSystem = Object.fromEntries(
 
         if (outputType === 'token') {
           const tokens = label2token(data);
-          callback(tokens);
+          if (!called) callback(null, tokens);
         } else {
-          callback(data);
+          if (!called) callback(null, data);
         }
+
+        called = true;
       }
     } else {
       value = _fs[key];
