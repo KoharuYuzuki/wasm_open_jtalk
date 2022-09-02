@@ -222,7 +222,7 @@ function label2token (log) {
     const end     = Number(match[2]);
     const phoneme = match[3];
     const accent  = (match[4] === 'xx') ? null : Number(match[4]);
-    const length  = (end - start) / 10000;
+    const length  = Math.round((end - start) / 10000);
 
     const isNull       = (accent === null);
     const isSmaller    = ((accent <= 0) && (prev1 >= 0) && (accent < prev1));
