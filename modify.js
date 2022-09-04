@@ -10,7 +10,7 @@ const replace = [
   ['require(\'fs\')', 'fileSystem'],
   ['process[\'on\']', '(() => {})'],
   ['throw toThrow;', '/* throw toThrow; */'],
-  ['process[\'exit\'](status);', '/* process[\'exit\'](status); */\n    if (!called) _fs.rmSync(inputPath);\n    if (!called) _fs.rmSync(outputPath);\n    if (!called) callback(toThrow, null);\n    called = true;']
+  ['process[\'exit\'](status);', '/* process[\'exit\'](status); */\n    if (!called) _fs.rmSync(inputPath, {force: true});\n    if (!called) _fs.rmSync(logPath, {force: true});\n    if (!called) _fs.rmSync(wavPath, {force: true});\n    if (!called) callback(toThrow, null, null);\n    called = true;']
 ];
 
 let script = fs.readFileSync(inputPath, {encoding: 'utf-8'});
@@ -282,14 +282,19 @@ function label2token (log) {
 
 const runOpenJTalk = (options, callback) => {
 let called = false;
+let LogWritingCompleted = false;
+let wavWritingCompleted = false;
 
 const tmpDir = ('tmp' in options) ? options.tmp : '.';
 const inputName = 'openjtalk_input_' + _crypto.randomUUID();
-const outputName = 'openjtalk_output_' + _crypto.randomUUID();
+const logName = 'openjtalk_log_' + _crypto.randomUUID();
+const wavName = 'openjtalk_wav_' + _crypto.randomUUID();
 const inputPath = _path.join(tmpDir, inputName);
-const outputPath = _path.join(tmpDir, outputName);
+const logPath = _path.join(tmpDir, logName);
+const wavPath = _path.join(tmpDir, wavName);
+const logOutput = (('token' in options) && options.token);
+const wavOutput = (('wav' in options) && options.wav);
 
-const outputType = (('type' in options) && (options.type === 'token')) ? 'token' : 'wav';
 const argv = [
   '',
   '',
@@ -297,9 +302,10 @@ const argv = [
   '-m', ('voice' in options) ? options.voice : '',
   '-r', ('speed' in options) ? String(options.speed) : '1.0',
   '-s', ('rate' in options) ? String(options.rate) : '48000',
-  (outputType === 'token') ? '-ot' : '-ow', outputPath,
+  (logOutput) ? ['-ot', logPath] : [],
+  (wavOutput) ? ['-ow', wavPath] : [],
   inputPath
-];
+].flat();
 
 const fileDescriptors = {};
 const fileSystem = Object.fromEntries(
@@ -321,23 +327,29 @@ const fileSystem = Object.fromEntries(
         delete fileDescriptors[fd];
 
         const basename = _path.basename(path);
-        if (basename !== outputName) return;
-
-        const data = _fs.readFileSync(path, {
-          encoding: (outputType === 'token') ? 'utf8' : null
-        });
-
-        _fs.rmSync(inputPath);
-        _fs.rmSync(outputPath);
-
-        if (outputType === 'token') {
-          const tokens = label2token(data);
-          if (!called) callback(null, tokens);
+        if (basename === logName) {
+          LogWritingCompleted = true;
+        } else if (basename === wavName) {
+          wavWritingCompleted = true;
         } else {
-          if (!called) callback(null, data);
+          return;
         }
 
+        if (called) return;
+        if (logOutput && !LogWritingCompleted) return;
+        if (wavOutput && !wavWritingCompleted) return;
+
         called = true;
+
+        const log = (logOutput) ? _fs.readFileSync(logPath, {encoding: 'utf8'}) : null;
+        const wav = (wavOutput) ? _fs.readFileSync(wavPath, {encoding: null}) : null;
+        const tokens = (logOutput) ? label2token(log) : null;
+
+        _fs.rmSync(inputPath, {force: true});
+        _fs.rmSync(logPath, {force: true});
+        _fs.rmSync(wavPath, {force: true});
+
+        callback(null, tokens, wav);
       }
     } else {
       value = _fs[key];

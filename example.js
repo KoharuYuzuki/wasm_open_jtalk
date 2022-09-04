@@ -8,12 +8,14 @@ openJTalk.run({
   voice: 'path/to/htsvoice_file',
   speed: 1.0,
   rate:  48000,
-  type:  'token', // token or wav
+  token: true,
+  wav:   true,
   tmp:   'path/to/tmp_dir'
-}, (err, result) => {
+}, (err, tokens, wav) => {
   if (!err) {
     console.log(err);
   } else {
-    console.log(result);
+    console.log('tokens:', tokens);
+    console.log('wav:',    wav);
   }
 });
